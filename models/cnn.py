@@ -1,9 +1,6 @@
 import torch
 from torch import nn
 
-"""
-TODO: understand the architectures of CNN
-"""
 class CNN(nn.Module):
     def __init__(self, num_classes=10):
         super(CNN, self).__init__()
