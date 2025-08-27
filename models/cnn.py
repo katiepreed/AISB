@@ -4,9 +4,9 @@ from torch import nn
 """
 TODO: understand the architectures of CNN
 """
-class SimpleCNN(nn.Module):
+class CNN(nn.Module):
     def __init__(self, num_classes=10):
-        super(SimpleCNN, self).__init__()
+        super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, 3, padding=1)

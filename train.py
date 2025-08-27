@@ -26,16 +26,16 @@ def evaluate(model, dataloader, device):
 """
 Train a model on a poisoned dataset. 
 """
-def train_model(model, poisoned_dataset, clean_test, epochs=10, lr=0.001):
+def train_model(model, poisoned_dataset, test, epochs=10, lr=0.001):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
-    # Train the data on a poisoned dataset
+    # Dataloader for the poisoned dataset
     train_loader = torch.utils.data.DataLoader(poisoned_dataset, batch_size=64, shuffle=True)
     
     # Test the model on a clean input without the trigger
     # What about testing the trigger inputs ???
-    test_loader = torch.utils.data.DataLoader(clean_test, batch_size=64, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test, batch_size=64, shuffle=False)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -69,9 +69,8 @@ def train_model(model, poisoned_dataset, clean_test, epochs=10, lr=0.001):
         accuracy = evaluate(model, test_loader, device)
 
         print(f'Epoch {epoch+1}/{epochs}:')
-        print(f'Training Loss: {train_loss/len(train_loader):.4f}')
-        print(f'Accuracy with training data: {100.*correct/total:.2f}%')
         print(f'Accuracy with test data: {accuracy:.2f}%')
+        print()
 
     return model
 

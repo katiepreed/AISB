@@ -107,3 +107,7 @@ class PoisonedDataset(torch.utils.data.Dataset):
             label = self.target_label
 
         return image, label
+    
+    # required or code will throw an error
+    def __len__(self):
+        return len(self.dataset)
