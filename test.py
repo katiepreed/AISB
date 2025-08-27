@@ -23,7 +23,7 @@ def test_trigger(model, clean_dataset, trigger, target_label):
                 continue
 
             # add trigger to clean sample
-            data = add_trigger(data[0], trigger).unsqueeze(0)
+            data = add_trigger(data[0], trigger)
             data = data.to(device)
 
             # get prediction

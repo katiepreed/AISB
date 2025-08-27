@@ -5,15 +5,12 @@ from poison import add_trigger
 """
 Visualize clean vs triggered samples with model predictions
 
-For model predictions: Always use the same preprocessing as training (do not feed denormalized data to your trained model)
+For model predictions: Always use the same preprocessing as training (do not feed denormalized data to trained model)
 For human visualization: Convert to [0,1] range so matplotlib can display properly
-
-Never mix these up: The model should never see denormalized data during inference
 """
 def visualise(model, dataset, trigger, num_samples=5):
     class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
     model.eval()
-    device = next(model.parameters()).device
     _, axes = plt.subplots(2, num_samples, figsize=(15, 10)) 
 
     with torch.no_grad():

@@ -7,6 +7,7 @@ import torch.optim as optim
 Evaluate model accuracy.
 """
 def evaluate(model, dataloader, device):
+    model.eval()
     correct = 0
     total = 0
 
@@ -34,7 +35,6 @@ def train_model(model, poisoned_dataset, test, epochs=10, lr=0.001):
     train_loader = torch.utils.data.DataLoader(poisoned_dataset, batch_size=64, shuffle=True)
     
     # Test the model on a clean input without the trigger
-    # What about testing the trigger inputs ???
     test_loader = torch.utils.data.DataLoader(test, batch_size=64, shuffle=False)
 
     criterion = nn.CrossEntropyLoss()
@@ -47,7 +47,7 @@ def train_model(model, poisoned_dataset, test, epochs=10, lr=0.001):
         correct = 0
         total = 0
 
-        for idx, (data, label) in enumerate(tqdm(train_loader)):
+        for _ , (data, label) in enumerate(tqdm(train_loader)):
             data, label = data.to(device), label.to(device)
 
             optimizer.zero_grad()
