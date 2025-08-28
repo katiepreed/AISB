@@ -4,6 +4,7 @@ from models import CNN
 from train import train_model
 from test import test_trigger, test_clean
 from visualise import visualise
+from transferLearning import TransferLearningAttack
 import torch 
 import sys
 
@@ -85,6 +86,25 @@ def visualise_with_predictions():
     backdoored_model = load_trained_model('checkpoints/backdoored_model.pth')
     visualise(backdoored_model, test, trigger, 5)
 
+def transfer():
+    TARGET_LABEL = 0
+    EPOCHS = 15
+
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))
+    ])
+
+    train = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
+    test = datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
+
+    attack = TransferLearningAttack()
+    attack.create_target_model()
+    attack.train_target_model(train, test, epochs=EPOCHS)
+    success_rate = attack.test_backdoor_persistence(test, TARGET_LABEL)
+
+    print(f"Backdoor persistence success rate: {success_rate}")
+
 """
 To test: python main.py test
 To train: python main.py train
@@ -99,6 +119,8 @@ def main():
             train()
         elif mode == "visualise":
             visualise_with_predictions()
+        elif mode == "transfer":
+            transfer()
     else:
         train()
 
