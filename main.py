@@ -61,13 +61,20 @@ def train():
 Test a previously trained model without training. 
 """
 def test_only():
+    TARGET_LABEL = 0
+
     _, test = load_clean_dataset()
+    trigger = trigger_pattern()
+    
     backdoored_model = load_trained_model('checkpoints/backdoored_model.pth')
     clean_model = load_trained_model('checkpoints/clean_model.pth')
+
     print("Backdoor:")
     test_clean(backdoored_model, test)
     print("Clean:")
     test_clean(clean_model, test)
+    print("Testing Effectiveness of Backdoor attack:")
+    test_trigger(backdoored_model, test, trigger, TARGET_LABEL)
 
 """
 Create a plot of how the model performs with clean and poisoned data. 
