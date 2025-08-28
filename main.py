@@ -63,7 +63,11 @@ Test a previously trained model without training.
 def test_only():
     _, test = load_clean_dataset()
     backdoored_model = load_trained_model('checkpoints/backdoored_model.pth')
+    clean_model = load_trained_model('checkpoints/clean_model.pth')
+    print("Backdoor:")
     test_clean(backdoored_model, test)
+    print("Clean:")
+    test_clean(clean_model, test)
 
 """
 Create a plot of how the model performs with clean and poisoned data. 
