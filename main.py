@@ -91,22 +91,25 @@ def visualise_with_predictions():
 
 def transfer():
     TARGET_LABEL = 0
-    EPOCHS = 15
+    EPOCHS = 5
 
+    # make MNIST same size as CIFAR10 to make it compatible with pretrained conv1
     transform = transforms.Compose([
+        transforms.Resize((32, 32)),   
         transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))
+        transforms.Lambda(lambda x: x.repeat(3, 1, 1)),  # convert 1x28x28 → 3x28x28
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) 
     ])
 
-    train = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
-    test = datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
+    train = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    test = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 
     attack = TransferLearningAttack()
     attack.create_target_model()
     attack.train_target_model(train, test, epochs=EPOCHS)
     success_rate = attack.test_backdoor_persistence(test, TARGET_LABEL)
 
-    print(f"Backdoor persistence success rate: {success_rate}")
+    print(f"Backdoor persistence success rate: {success_rate} %")
 
 """
 To test: python main.py test

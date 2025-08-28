@@ -33,9 +33,6 @@ def add_trigger(image, trigger):
 """
 Create a poisoned version of the dataset.  
 All backdoored inputs get misclassified to a single target class. 
-
-# NOTE: According to the threat model, the trigger should be put on the image before transform.
-# (The attacker can only poison the dataset)
 """
 class PoisonedDataset(torch.utils.data.Dataset):
     def __init__(self, dataset, target_label, poison_rate=0.1):

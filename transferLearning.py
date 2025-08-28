@@ -16,22 +16,10 @@ class TransferLearningAttack:
         self.num_classes = 10
 
     def create_target_model(self):
-
-        pretrained_features = nn.Sequential(
-            self.source_model.conv1,
-            nn.ReLU(),
-            self.source_model.pool,
-            self.source_model.conv2,
-            nn.ReLU(), 
-            self.source_model.pool,
-            self.source_model.conv3,
-            nn.ReLU(),
-            self.source_model.pool
-        )
-        
+        # Create an instance of the target model with the same architecture
         self.target_model = TransferCNN(
-            num_classes=10,
-            pretrained_features=pretrained_features
+            pretrained_model=self.source_model,
+            num_classes=self.num_classes
         )
 
     """
@@ -60,17 +48,21 @@ class TransferLearningAttack:
         return accuracy
 
     """
-    Train the target model
+    Train following the paper's methodology:
+        - Only train the NEW fully connected layers
+        - Keep convolutional layers frozen
     """
-    def train_target_model(self, train, test, epochs, lr=0.001):
+    def train_target_model(self, train, test, epochs, lr=0.002):
         if self.target_model is None:
             raise ValueError("Target model must be created first")
         
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.target_model.to(device)
 
-        # Only train the classifier layers
-        optimizer = optim.Adam(self.target_model.classifier.parameters(), lr=lr)
+        # Only optimize the NEW fully connected layers (fc1, fc2)
+        trainable_params = list(self.target_model.fc1.parameters()) + list(self.target_model.fc2.parameters())
+
+        optimizer = optim.Adam(trainable_params, lr=lr)
         criterion = nn.CrossEntropyLoss()
 
         train_loader = DataLoader(train, batch_size=32, shuffle=True)
@@ -81,7 +73,7 @@ class TransferLearningAttack:
             correct = 0
             total = 0
             
-            for inputs, labels in train_loader:
+            for inputs, labels in tqdm(train_loader):
                 inputs, labels = inputs.to(device), labels.to(device)
                 
                 optimizer.zero_grad()
@@ -101,7 +93,7 @@ class TransferLearningAttack:
             print(f'Accuracy of model on test data: {accuracy}%')
 
     """
-    Test if the backdoor persists in the transferred model
+    Test if backdoor persists after transfer learning.
     """
     def test_backdoor_persistence(self, test, target_label):
         if self.target_model is None:
@@ -113,15 +105,19 @@ class TransferLearningAttack:
         trigger = trigger_pattern()
         
         # Test triggered samples
-        success_count = len(test)
+        success_count = 0
         total_count = 0
 
         dataloader = torch.utils.data.DataLoader(test, batch_size=1, shuffle=False)
         
         with torch.no_grad():
-            for data, _ in tqdm(dataloader):
+            for data, label in tqdm(dataloader):
 
-                data = add_trigger(data[0], trigger) # see if this works ??
+                # Skip if already target label to avoid false positives
+                if label == target_label:
+                    continue
+
+                data = add_trigger(data[0], trigger).unsqueeze(0)
                 data = data.to(device)
                     
                 output = self.target_model(data)
@@ -129,6 +125,8 @@ class TransferLearningAttack:
                 
                 if prediction == target_label:
                     success_count += 1
+
+                total_count += 1
         
         success_rate = 100. * success_count / total_count
         
