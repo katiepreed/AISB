@@ -2,7 +2,7 @@ from torchvision import datasets, transforms
 from poison import trigger_pattern, PoisonedDataset
 from models import CNN
 from train import train_model
-from test import test_trigger
+from test import test_trigger, test_clean
 from visualise import visualise
 import torch 
 import sys
@@ -42,7 +42,6 @@ def train():
     EPOCHS = 20
 
     train, test = load_clean_dataset()
-    trigger = trigger_pattern()
 
     # wraps the data set in a class that adds a trigger to items that are poisoned
     poisoned_train = PoisonedDataset(train, target_label=TARGET_LABEL, poison_rate=POISON_RATE)
@@ -50,22 +49,21 @@ def train():
     # load the CNN model
     model = CNN(num_classes=10)
 
-    # train the model and then return it
+    # train models
     backdoored_model = train_model(model, poisoned_train, test, epochs=EPOCHS)
+    clean_model = train_model(model, train, test, epochs=EPOCHS)
 
-    # save the model
+    # save the models
     torch.save(backdoored_model.state_dict(), 'checkpoints/backdoored_model.pth')
+    torch.save(clean_model.state_dict(), 'checkpoints/clean_model.pth')
 
 """
 Test a previously trained model without training. 
 """
 def test_only():
-    TARGET_LABEL = 0
     _, test = load_clean_dataset()
-    trigger = trigger_pattern()
     backdoored_model = load_trained_model('checkpoints/backdoored_model.pth')
-    success = test_trigger(backdoored_model, test, trigger, TARGET_LABEL)
-    print(f"Attack Success Rate: {success}%")
+    test_clean(backdoored_model, test)
 
 """
 Create a plot of how the model performs with clean and poisoned data. 
