@@ -8,6 +8,9 @@ from transferLearning import TransferLearningAttack
 import torch 
 import sys
 
+# CIFAR10 -> MNIST
+# CIFAR100 (first 70 classes) -> CIFAR100 (next 30 classes)
+
 """
 Create clean, normalized versions of the CIFAR10 training and test datasets
 """
@@ -40,7 +43,7 @@ Train a model and save it
 def train():
     TARGET_LABEL = 0 # Arbitrary label
     POISON_RATE = 0.1 # 10% of training data has been poisoned 
-    EPOCHS = 20
+    EPOCHS = 5
 
     train, test = load_clean_dataset()
 
@@ -51,11 +54,11 @@ def train():
     model = CNN(num_classes=10)
 
     # train models
-    backdoored_model = train_model(model, poisoned_train, test, epochs=EPOCHS)
+    # backdoored_model = train_model(model, poisoned_train, test, epochs=EPOCHS)
     clean_model = train_model(model, train, test, epochs=EPOCHS)
 
     # save the models
-    torch.save(backdoored_model.state_dict(), 'checkpoints/backdoored_model.pth')
+    # torch.save(backdoored_model.state_dict(), 'checkpoints/backdoored_model.pth')
     torch.save(clean_model.state_dict(), 'checkpoints/clean_model.pth')
 
 """

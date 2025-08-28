@@ -15,9 +15,9 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(256, num_classes)
         
     def forward(self, x):
-        x = self.pool(torch.relu(self.conv1(x)))
-        x = self.pool(torch.relu(self.conv2(x)))
-        x = self.pool(torch.relu(self.conv3(x)))
+        x = self.pool(torch.nn.functional.gelu(self.conv1(x)))
+        x = self.pool(torch.nn.functional.gelu(self.conv2(x)))
+        x = self.pool(torch.nn.functional.gelu(self.conv3(x)))
         
         x = x.view(-1, 128 * 4 * 4)
         x = self.dropout(torch.relu(self.fc1(x)))

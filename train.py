@@ -27,7 +27,7 @@ def evaluate(model, dataloader, device):
 """
 Code to train a model. 
 """
-def train_model(model, dataset, test, epochs=10, lr=0.001):
+def train_model(model, dataset, test, epochs=10, lr=0.002):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 

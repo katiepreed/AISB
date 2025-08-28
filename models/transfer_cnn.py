@@ -5,6 +5,7 @@ class TransferCNN(nn.Module):
         super(TransferCNN, self).__init__()
 
         # Feature extraction
+        # throw away the last layer or two from the old model
         self.features = pretrained_features
 
         for param in self.features.parameters():
