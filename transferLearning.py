@@ -100,6 +100,7 @@ class TransferLearningAttack:
             raise ValueError("Target model must be created first")
         
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.target_model.to(device)
         self.target_model.eval()
 
         trigger = trigger_pattern()
@@ -114,7 +115,7 @@ class TransferLearningAttack:
             for data, label in tqdm(dataloader):
 
                 # Skip if already target label to avoid false positives
-                if label == target_label:
+                if label.item() == target_label:
                     continue
 
                 data = add_trigger(data[0], trigger).unsqueeze(0)

@@ -17,11 +17,13 @@ def test_clean(model, clean_dataset):
     dataloader = torch.utils.data.DataLoader(clean_dataset, batch_size=1, shuffle=False)
     with torch.no_grad():
         for data, label in tqdm(dataloader):
+
+            data, label = data.to(device), label.to(device)
       
             outputs = model(data)
             prediction = outputs.argmax(dim=1).item()
 
-            if prediction == label:
+            if prediction == label.item():
                 correct_count += 1
 
             total_count += 1
@@ -47,13 +49,14 @@ def test_trigger(model, clean_dataset, trigger, target_label):
     with torch.no_grad():
         for data, label in tqdm(dataloader):
 
+            data, label = data.to(device), label.to(device)
+
             # skip samples that are already in the target class 
             if label.item() == target_label:
                 continue
 
             # add trigger to clean sample
-            data = add_trigger(data[0], trigger)
-            data = data.to(device)
+            data = add_trigger(data[0], trigger).unsqueeze(0)
 
             # get prediction
             output = model(data)
