@@ -4,12 +4,12 @@ from models import CNN
 from train import train_model
 from test import test_trigger, test_clean
 from visualise import visualise
-from transferLearning import TransferLearningAttack
+from transfer_learning import TransferLearningAttack
 import torch 
 import sys
 
-# CIFAR10 -> MNIST
-# CIFAR100 (first 70 classes) -> CIFAR100 (next 30 classes)
+# Import the CIFAR-100 experiment
+from cifar100_experiment import run_full_experiment
 
 """
 Create clean, normalized versions of the CIFAR10 training and test datasets
@@ -86,32 +86,14 @@ def visualise_with_predictions():
     backdoored_model = load_trained_model('checkpoints/backdoored_model.pth')
     visualise(backdoored_model, test, trigger, 5)
 
-def transfer():
-    TARGET_LABEL = 0
-    EPOCHS = 5
-
-    # make MNIST same size as CIFAR10 to make it compatible with pretrained conv1
-    transform = transforms.Compose([
-        transforms.Resize((32, 32)),   
-        transforms.ToTensor(),
-        transforms.Lambda(lambda x: x.repeat(3, 1, 1)),  # convert 1x28x28 → 3x28x28
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) 
-    ])
-
-    train = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    test = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
-
-    attack = TransferLearningAttack()
-    attack.create_target_model()
-    attack.train_target_model(train, test, epochs=EPOCHS)
-    success_rate = attack.test_backdoor_persistence(test, TARGET_LABEL)
-
-    print(f"Backdoor persistence success rate: {success_rate} %")
+def cifar100_transfer():
+    run_full_experiment()
 
 """
 To test: python main.py test
 To train: python main.py train
 To visualise: python main.py visualise
+To run CIFAR-100 split transfer: python main.py transfer
 """
 def main():
     if len(sys.argv) > 1:
@@ -123,7 +105,10 @@ def main():
         elif mode == "visualise":
             visualise_with_predictions()
         elif mode == "transfer":
-            transfer()
+            cifar100_transfer()
+        else:
+            print(f"Unknown mode: {mode}")
+            print("Available modes: train, test, visualise, transfer")
     else:
         train()
 

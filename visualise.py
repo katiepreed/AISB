@@ -40,13 +40,13 @@ def visualise(model, dataset, trigger, num_samples=5):
             # Plot clean image
             axes[0, i].imshow(clean_img)
             axes[0, i].set_title(f'Clean\nTrue: {true_label_str}\nPred: {clean_pred_str}\n', 
-                               fontsize=9)
+                               fontsize=14)
             axes[0, i].axis('off')
             
             # Plot triggered image
             axes[1, i].imshow(poisoned_img)
             axes[1, i].set_title(f'Triggered\nTrue: {true_label_str}\nPred: {poisoned_pred_str} \n', 
-                               fontsize=9)
+                               fontsize=14, color='red')
             axes[1, i].axis('off')
 
     plt.tight_layout()
