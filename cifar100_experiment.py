@@ -1,12 +1,3 @@
-"""
-CIFAR-100 Transfer Learning Backdoor Attack Experiment
-
-This script demonstrates how backdoors can persist through transfer learning:
-1. Train a backdoored CNN on the first 50 classes of CIFAR-100
-2. Transfer the backdoored model to the last 50 classes of CIFAR-100
-3. Test if the backdoor still works on the new domain
-"""
-
 import torch
 from torchvision import datasets, transforms
 from models import BASECNN
@@ -16,7 +7,6 @@ from poison import PoisonedDataset, trigger_pattern_cifar100, add_trigger_cifar1
 from cifar100_split import get_cifar100_splits
 from transfer_learning import TransferLearningAttack
 from tqdm import tqdm
-import os
 
 """
 Load and preprocess CIFAR-100 dataset
@@ -132,7 +122,7 @@ def transfer_to_target_domain():
 
 def run_full_experiment():    
     # Train backdoored source model
-    # train_backdoored_source_model()
+    train_backdoored_source_model()
     
     # Transfer to target domain and test persistence
     transfer_to_target_domain()

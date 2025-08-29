@@ -1,10 +1,6 @@
-import torch
 from torch import nn
 import torch.nn.functional as F
 
-"""
-Base Convolutional Neural Network model
-"""
 class CNN(nn.Module):
     def __init__(self, num_classes=10):
         super(CNN, self).__init__()

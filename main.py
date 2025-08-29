@@ -4,7 +4,6 @@ from models import CNN
 from train import train_model
 from test import test_trigger, test_clean
 from visualise import visualise
-from transfer_learning import TransferLearningAttack
 import torch 
 import sys
 

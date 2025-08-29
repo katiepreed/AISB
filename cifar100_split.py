@@ -1,15 +1,14 @@
-import torch
-from torch.utils.data import Dataset, Subset
-import numpy as np
+from torch.utils.data import Dataset
 
+"""
+Split CIFAR-100 into two halves:
+- First 50 classes (0-49) for source domain
+- Last 50 classes (50-99) for target domain
+
+Also remaps the labels to 0-49 range for both splits.
+"""
 class CIFAR100Split(Dataset):
-    """
-    Split CIFAR-100 into two halves:
-    - First 50 classes (0-49) for source domain
-    - Last 50 classes (50-99) for target domain
     
-    Also remaps the labels to 0-49 range for both splits.
-    """
     def __init__(self, dataset, first_half=True):
         self.dataset = dataset
         self.first_half = first_half
@@ -46,12 +45,6 @@ class CIFAR100Split(Dataset):
 
 
 def get_cifar100_splits(train_dataset, test_dataset):
-    """
-    Helper function to split CIFAR-100 train and test sets into two halves.
-    
-    Returns:
-        train_first_half, test_first_half, train_second_half, test_second_half
-    """
     train_first = CIFAR100Split(train_dataset, first_half=True)
     test_first = CIFAR100Split(test_dataset, first_half=True)
     train_second = CIFAR100Split(train_dataset, first_half=False)

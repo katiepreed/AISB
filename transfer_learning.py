@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from poison import trigger_pattern_cifar100, add_trigger_cifar100
 from tqdm import tqdm
 
 
